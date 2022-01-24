@@ -11,7 +11,7 @@ import org.jetbrains.compose.web.renderComposable
 import org.w3c.dom.events.MouseEvent
 import kotlin.random.Random
 
-open class Field () {
+open class Field  {
     var value : Char = '0'
     val neighbors: MutableList<Field> = mutableStateListOf()
     var visible : Boolean by mutableStateOf(false)
@@ -36,29 +36,21 @@ fun main() {
         mutableStateListOf(null, null, null, null, null, null, null, null, null, null, null, null)
 
     )
-    fun AddNeibors() {
-        for (row in 1..10) {
-            for (col in 1..10) {
-                list[row][col]!!.neighbors.add(list[row - 1][col - 1]!!)
-                list[row][col]!!.neighbors.add(list[row - 1][col]!!)
-                list[row][col]!!.neighbors.add(list[row - 1][col + 1]!!)
-                list[row][col]!!.neighbors.add(list[row][col - 1]!!)
-                list[row][col]!!.neighbors.add(list[row][col + 1]!!)
-                list[row][col]!!.neighbors.add(list[row + 1][col - 1]!!)
-                list[row][col]!!.neighbors.add(list[row + 1][col]!!)
-                list[row][col]!!.neighbors.add(list[row + 1][col + 1]!!)
-
+    fun createFields() {
+        for (row in 0..11) {
+            for (col in 0..11) {
+                var field = Field()
+                list[row][col] = field
             }
         }
     }
 
 
+    fun generateMines(){
 
-    fun GenerateMines(){
-    var rowIndex: Int by mutableStateOf(0)
-    var colIndex: Int by mutableStateOf(0)
-    var count15: Int by mutableStateOf(0)
-
+        var rowIndex: Int by mutableStateOf(0)
+        var colIndex: Int by mutableStateOf(0)
+        var count15: Int by mutableStateOf(0)
     while(count15 < 20) {
         rowIndex = Random.nextInt(10)
         colIndex = Random.nextInt(10)
@@ -68,35 +60,69 @@ fun main() {
         }
     }
     }
-    fun SetNumbers() {
 
-        for(row in 1..10) {
-            for (col in 1..10) {
 
-                if(list[row][col]!!.value == '*'){
-                    for(n  in list[row][col]!!.neighbors){
-                        if(n.value != '*'){
-                            n.value++
-                        }
+   fun setNeighbors() {
+       for (row in 1..10) {
+           for (col in 1..10) {
+               list[row][col]!!.neighbors.add(list[row - 1][col - 1]!!)
+               list[row][col]!!.neighbors.add(list[row - 1][col]!!)
+               list[row][col]!!.neighbors.add(list[row - 1][col + 1]!!)
+               list[row][col]!!.neighbors.add(list[row][col - 1]!!)
+               list[row][col]!!.neighbors.add(list[row][col + 1]!!)
+               list[row][col]!!.neighbors.add(list[row + 1][col - 1]!!)
+               list[row][col]!!.neighbors.add(list[row + 1][col]!!)
+               list[row][col]!!.neighbors.add(list[row + 1][col + 1]!!)
+
+           }
+       }
+   }
+    createFields()
+    generateMines()
+setNeighbors()
+
+
+
+
+
+
+fun setNumbers() {
+    for (row in 1..10) {
+        for (col in 1..10) {
+            console.log(row)
+            console.log(col)
+            console.log("bu")
+            if (list[row][col]!!.value == '*') {
+                for (n in list[row][col]!!.neighbors) {
+                    if (n.value != '*') {
+                        n.value++
                     }
                 }
-
             }
+
         }
+    }
+}
+    setNumbers()
+
+
+
+
+    var lost : Boolean by mutableStateOf(false)
+
+    if(lost){
+        window.setTimeout({
+            window.alert("Boooom! You loose")
+        }, 200)
+
+
     }
 
 
 
-    GenerateMines()
-    AddNeibors()
-    SetNumbers()
-
-
-
-
-
-
-//Methods called in the table
+    var flag : Boolean by mutableStateOf(false)
+    var explore : Boolean by mutableStateOf(false)
+    var mines : Int by mutableStateOf(25)
 
 
     fun ShowNeighbors() {
@@ -110,6 +136,8 @@ fun main() {
             }
         }
     }
+
+    //Methods used in the table
 
     fun End(){
         var visibleCount : Int by mutableStateOf(0)
@@ -135,12 +163,17 @@ fun main() {
 
 
         }, 300)
+        for(row in 1..10){
+            for(col in 1..10){
+                list[row][col]!!.visible = true
+            }
+        }
 
 
 
     }
    fun Reset(){
-       for(row in 0..11){
+     /*  for(row in 0..11){
            for(col in 0..11){
                list[row][col]!!.value =  '0'
                list[row][col]!!.visible = false
@@ -148,25 +181,48 @@ fun main() {
            }
        }
 
-   } 
+      */
+      createFields()
+       generateMines()
+       setNeighbors()
+           setNumbers()
 
-//Variables needed in the table
+   }
 
-    var flag : Boolean by mutableStateOf(false)
-    var explore : Boolean by mutableStateOf(false)
-    var reset : Boolean by mutableStateOf(false)
+    fun flagCount  (): Int{
+        var flagCount : Int by mutableStateOf(20)
+
+        for(row in 1..10){
+            for(col in 1..10){
+                if(list[row][col]!!.flagged){
+                    flagCount--
+                }
+            }
+        }
+        return flagCount
+    }
+
+
+
+
+
+
+
+
 
     renderComposable(rootElementId = "root") {
+        //Button table
         Table({
             style {
                 border(5.px, LineStyle.Solid, Color.midnightblue)
                 width(1137.px)
                 height(100.px)
                 textAlign("center")
-                property("color", "pink")
+                backgroundColor(Color.cornflowerblue)
             }
         }){
             Tr{
+                //Flag button
                 Td({
 
                 }){
@@ -181,15 +237,18 @@ fun main() {
 
 
                         style {
-                            border(25.px)
-                            width(100.px)
+
+
+                            width(125.px)
                             height(100.px)
                             fontSize(30.px)
                             if(flag){
-                                backgroundColor(Color.darksalmon)
+                                backgroundColor(Color.red)
+                                border(5.px, LineStyle.Inset)
                             }
                             else{
-                                backgroundColor(Color.lightsalmon)
+                                backgroundColor(Color.maroon)
+                                border(5.px, LineStyle.Outset)
                             }
 
                             margin(10.px)
@@ -199,6 +258,7 @@ fun main() {
                         Text ("Flag")
                     }
                 }
+                //Explore button
                 Td({
 
                 }) {
@@ -211,15 +271,18 @@ fun main() {
 
 
                         style {
-                            border(25.px)
-                            width(100.px)
+
+                            width(125.px)
                             height(100.px)
                             fontSize(30.px)
+
                             if(explore) {
-                                backgroundColor(Color.darksalmon)
+                                backgroundColor(Color.springgreen)
+                                border(5.px, LineStyle.Inset)
                             }
                             else{
-                                backgroundColor(Color.lightsalmon)
+                                backgroundColor(Color.darkgreen)
+                                border(5.px, LineStyle.Outset)
                             }
                             margin(10.px)
 
@@ -228,21 +291,46 @@ fun main() {
                         Text("Explore")
                     }
                 }
+                //Mines counter
+                Td({
+
+                })
+
+                {
+
+                    Button(attrs = {
+
+
+
+                        style {
+                            border(5.px, LineStyle.Inset)
+                            width(125.px)
+                            height(100.px)
+                            fontSize(30.px)
+
+                           backgroundColor(Color.white)
+                            margin(10.px)
+
+                        }
+                    }) {
+                        Text("Mines: ${flagCount()}")
+                    }
+                }
+                //Reset button
                 Td({
 
                 }) {
                     Button(attrs = {
                         onClick {
 
-                            main()
+                            Reset()
                         }
 
                         style {
-                            border(25.px)
-                            width(100.px)
+                            border(5.px, LineStyle.Outset)
+                            width(125.px)
                             height(100.px)
                             fontSize(30.px)
-                            textDecorationColor(Color.orange)
                             backgroundColor(Color.lightsalmon)
                             margin(10.px)
 
@@ -256,7 +344,7 @@ fun main() {
             }
         }
 
-
+//Main table
         Table{
             for(tableRow in 1..10){
                 Tr{
@@ -267,6 +355,7 @@ fun main() {
                                 width(100.px)
                                 height(100.px)
                                 textAlign("center")
+                                backgroundColor(Color.lightslategray)
                                 when(list[tableRow][tableCol]!!.value){
                                     '*'  -> property("color", "orangered")
                                     '1' -> property("color", "blue")
@@ -279,11 +368,9 @@ fun main() {
                                 if(list[tableRow][tableCol]!!.flagged){
                                     property("color", "orangered")
                                 }
-
-
                                 fontSize(70.px)
                                 property("table-layout", "fixed")
-                                //display(FieldVisibility(list[tableRow][tableCol]!!.visible))
+
 
 
                             }
@@ -291,6 +378,15 @@ fun main() {
                                 if (explore) {
                                     list[tableRow][tableCol]!!.visible = true
                                     ShowNeighbors()
+                                    ShowNeighbors()
+                                    ShowNeighbors()
+                                    ShowNeighbors()
+                                    ShowNeighbors()
+                                    ShowNeighbors()
+                                    ShowNeighbors()
+                                    ShowNeighbors()
+                                    ShowNeighbors()
+
                                     if (list[tableRow][tableCol]!!.value == '*') {
                                         list[tableRow][tableCol]!!.visible = true
                                         GameOver()
@@ -307,6 +403,7 @@ fun main() {
                                     }
 
                                 }
+                                flagCount()
                                 End()
                             }
 
@@ -324,6 +421,10 @@ fun main() {
                             }) {
                                 if(list[tableRow][tableCol]!!.flagged){
                                     Text("☣")
+                                    //mines--
+                                }
+                                else if(list[tableRow][tableCol]!!.value == '*'){
+                                    Text("💥")
                                 }
                                 else {
                                     Text(list[tableRow][tableCol]!!.value.toString())
@@ -337,6 +438,8 @@ fun main() {
         }
     }
 }
+
+
 
 
 
