@@ -89,9 +89,6 @@ setNeighbors()
 fun setNumbers() {
     for (row in 1..10) {
         for (col in 1..10) {
-            console.log(row)
-            console.log(col)
-            console.log("bu")
             if (list[row][col]!!.value == '*') {
                 for (n in list[row][col]!!.neighbors) {
                     if (n.value != '*') {
@@ -138,6 +135,7 @@ fun setNumbers() {
     }
 
     //Methods used in the table
+    var isLost : Boolean by mutableStateOf(false);
 
     fun End(){
         var visibleCount : Int by mutableStateOf(0)
@@ -147,7 +145,7 @@ fun setNumbers() {
                 visibleCount++
 
             }
-                if(visibleCount>=100){window.setTimeout({
+                if(visibleCount>=100 && lost == false){window.setTimeout({
                     window.alert("Yeaaah, You win")
                 }, 300)}
 
@@ -168,6 +166,7 @@ fun setNumbers() {
                 list[row][col]!!.visible = true
             }
         }
+        lost = true;
 
 
 
@@ -267,7 +266,7 @@ fun setNumbers() {
                             explore = true
                             flag = false
                         }
-                        console.log(explore)
+
 
 
                         style {
@@ -345,7 +344,15 @@ fun setNumbers() {
         }
 
 //Main table
-        Table{
+        Table({
+            style{
+                width(1137.px)
+                height(1137.px)
+            }
+        })
+
+        {
+
             for(tableRow in 1..10){
                 Tr{
                     for(tableCol in 1..10){
