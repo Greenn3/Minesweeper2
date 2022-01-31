@@ -1,7 +1,4 @@
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import kotlinx.browser.window
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withTimeout
@@ -36,6 +33,11 @@ fun main() {
         mutableStateListOf(null, null, null, null, null, null, null, null, null, null, null, null)
 
     )
+
+
+    /*val list: MutableList<MutableList<Field?>> = (0..11).map { (0..11).map { null }.toMutableList() }.toMutableList()
+
+     */
     fun createFields() {
         for (row in 0..11) {
             for (col in 0..11) {
@@ -172,19 +174,12 @@ fun setNumbers() {
 
     }
    fun Reset(){
-     /*  for(row in 0..11){
-           for(col in 0..11){
-               list[row][col]!!.value =  '0'
-               list[row][col]!!.visible = false
-               list[row][col]!!.flagged = false
-           }
-       }
 
-      */
       createFields()
        generateMines()
        setNeighbors()
            setNumbers()
+       lost = false
 
    }
 
@@ -404,7 +399,7 @@ fun setNumbers() {
                                         list[tableRow][tableCol]!!.visible = false
                                         list[tableRow][tableCol]!!.flagged = false
                                     }
-                                    else {
+                                    else if (list[tableRow][tableCol]!!.flagged == false && list[tableRow][tableCol]!!.visible == false){
                                         list[tableRow][tableCol]!!.flagged = true
                                         list[tableRow][tableCol]!!.visible = true
                                     }
