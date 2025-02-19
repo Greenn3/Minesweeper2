@@ -1,8 +1,8 @@
-import org.jetbrains.compose.compose
+import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 
 plugins {
-    kotlin("multiplatform") version "1.5.21"
-    id("org.jetbrains.compose") version "1.0.0-alpha3"
+    kotlin("multiplatform") version "1.9.20" // Latest stable Kotlin version (check compatibility)
+    id("org.jetbrains.compose") version "1.5.11" // Latest stable Compose Multiplatform version
 }
 
 group = "me.asia"
@@ -18,7 +18,6 @@ kotlin {
     js(IR) {
         browser {
             testTask {
-                testLogging.showStandardStreams = true
                 useKarma {
                     useChromeHeadless()
                     useFirefox()
@@ -27,24 +26,20 @@ kotlin {
         }
         binaries.executable()
     }
+
     sourceSets {
         val jsMain by getting {
             dependencies {
-                implementation(compose.web.core)
+                implementation(compose.html.core) // Updated from compose.web.core
                 implementation(compose.runtime)
             }
         }
         val jsTest by getting {
             dependencies {
-                implementation(kotlin("test-js"))
+                implementation(kotlin("test"))
             }
         }
     }
 }
-// a temporary workaround for a bug in jsRun invocation - see https://youtrack.jetbrains.com/issue/KT-48273
-afterEvaluate {
-    rootProject.extensions.configure<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension> {
-        versions.webpackDevServer.version = "4.0.0"
-        versions.webpackCli.version = "4.9.0"
-    }
-}
+
+// Remove outdated workaround, Webpack should work fine in newer versions

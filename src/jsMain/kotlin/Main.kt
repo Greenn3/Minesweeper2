@@ -1,11 +1,10 @@
 import androidx.compose.runtime.*
 import kotlinx.browser.window
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.withTimeout
+
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.*
 import org.jetbrains.compose.web.renderComposable
-import org.w3c.dom.events.MouseEvent
+
 import kotlin.random.Random
 
 open class Field  {
